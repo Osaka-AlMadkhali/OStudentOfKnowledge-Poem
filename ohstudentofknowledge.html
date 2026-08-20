@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> O Student of Knowledge Poem - Digital Reader with Sharh</title>
+    <style>
+        :root {
+            --bg-color: #fcfbf7;
+            --card-bg: #ffffff;
+            --text-main: #2c2c2c;
+            --text-muted: #666666;
+            --accent: #8c7355;
+            --accent-hover: #6f5941;
+            --border: #e6e2da;
+            --sharh-bg: #f5f2eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .meta-info {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .counter-badge {
+            background-color: var(--accent);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        #searchBar:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .poem-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .verse-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .verse-num {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .arabic-text {
+            font-family: 'Traditional Arabic', 'Amiri', Georgia, serif;
+            font-size: 1.5rem;
+            text-align: right;
+            direction: rtl;
+            line-height: 2.2rem;
+            color: #1a1a1a;
+        }
+
+        .english-text {
+            font-size: 1.05rem;
+            text-align: left;
+            line-height: 1.6rem;
+            color: #3d3d3d;
+            border-left: 3px solid var(--border);
+            padding-left: 15px;
+        }
+
+        .sharh-btn {
+            align-self: flex-start;
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 6px 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 5px;
+        }
+
+        .sharh-btn:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .sharh-box {
+            display: none;
+            background-color: var(--sharh-bg);
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 5px;
+            font-size: 0.95rem;
+            line-height: 1.5rem;
+            border-left: 3px solid var(--accent);
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 30px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1> أيا طالب العلم قم لا تنم (O Seeker of Knowledge, Arise Do Not Sleep)</h1>
+        <p class="meta-info"> Poem by: Dr. Majid Ash-Shaybah</p>
+        <p class="meta-info">Total Loaded Verses: <span id="pageCounter" class="counter-badge">0</span></p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search verses, translations, or sharh..." onkeyup="filterVerses()">
+    </div>
+
+    <main class="poem-container" id="poemContainer">
+        <!-- Verses injected here dynamically -->
+    </main>
+
+    <script>
+        // ==========================================
+        // EASY ACCESS DATA SECTION
+        // Each entry now includes a 'sharh' key.
+        // ==========================================
+        const poemData = [
+            {
+                number: 1,
+                arabic: "أيا طالب العلم قم لا تنم ... فإن الزمان انقضى وانصرم",
+                english: "O student of knowledge, arise do not sleep ... For indeed the time passes and slips by.",
+                sharh: "<strong>Sharh:</strong> His saying: '(O student of knowledge)' is an urgent call directed to the seekers of Islamic knowledge, utilizing a particle meant for distance to awaken the student from any distance of heedlessness or laziness; '(arise do not sleep)' is a strict command to avoid laziness, procrastination, and excessive comfort, because the high pursuit of the Shari'ah cannot be attained through relaxation; '(For indeed the time passes and slips by)' is a warning regarding the reality of time, which is important for a believer and student of knowledge, emphasizing that it moves rapidly, cuts off, and is completely irreversible, so every moment that vanishes brings the individual closer to the end of their lifespan and the end of their actions."
+            },
+            {
+                number: 2,
+                arabic: "فكن ما حييت ضنينًا به ... فضنك بالوقت عين الكرم",
+                english: "So be stingy with it (time) as long as you live ... For your stinginess in time is the essence of generosity.",
+                sharh: "<strong>Sharh:</strong> His saying: '(So be stingy with it as long as you live)' is a command to guard and protect your time from being wasted on things that do not benefit you, using the word 'stingy' because a student must be greedy with their hours throughout their entire life and repurpose it for studying and seeking knowledge; '(for your stinginess with time)' means that keeping your time only for beneficial knowledge and worship is a praised action, unlike being stingy with money which is bad; '(is the essence of generosity)' means this careful guarding of your time is the reality of generosity and respect toward yourself, because saving your time for what matters is being truly generous to your own soul and your Hereafter."
+            },
+            {
+                number: 3,
+                arabic: "وكن حلس درسك وافرح به ... تكن قائدًا في غدٍ للأمم",
+                english: "And be devoted to your study and be happy in it ... You will become a leader tomorrow for the nations.",
+                sharh: "<strong>Sharh:</strong> His saying: '(And be devoted to your study)' is a command to stick to the books, lessons, and circles of knowledge without ever leaving them, using a word whose origin is the saddle-like blanket that never leaves the camel's back 'ح ل س'; '(and be happy in it)' means to find true joy, comfort, and peace in seeking knowledge rather than viewing it as a heavy or boring burden; '(You will become a leader tomorrow for the nations)' means that continuous patience and attachment to Islamic knowledge is the direct path to attaining religious leadership in the future, allowing you to guide entire communities upon the truth."
+            },
+            {
+                number: 4,
+                arabic: "وبادر شبابك من قبل أن ... يقطع عزمك سيف الهرم",
+                english: "And hasten in your youth before ... The sword of old age cuts off your determination.",
+                sharh: "<strong>Sharh:</strong> His saying: '(And hasten in your youth)' is a command to quickly take the initiative and strive during your young years to seek knowledge while your mind is sharp and you have fewer responsibilities; '(before... the sword of old age)' is a warning about reaching extreme old age, which the poet compares to a weapon because it arrives and destroys your physical strength; '(cuts off your determination)' means that getting old will completely break your motivation and body, stopping you from doing studying you easily could have done when you were young."
+            },
+            {
+                number: 5,
+                arabic: "ودع ما استطعت فضول الختلاطٍ ... وأكلٍ ونومٍ وقولٍ يذم",
+                english: "And abandon as much as you can excessive mixing (with people) ... And eating, sleeping, and blameworthy speech.",
+                sharh: "<strong>Sharh:</strong> His saying: '(And abandon as much as you can excessive mixing)' is a command to stay away from unnecessary socializing and wasting hours around people, because excessive socializing corrupts the heart and distracts the student from their lessons; '(and eating, sleeping)' is a direct warning against overeating and oversleeping, because consuming too much food makes the body heavy, brings laziness, and causes a person to waste their life in bed instead of striving; '(and blameworthy speech)' means to guard the tongue from all useless or prohibited talk, because the student of knowledge must protect their speech so that their heart remains pure and ready to carry the texts of the Shari'ah."
+            },
+            {
+                number: 6,
+                arabic: "وصاحب تبيلًا ولا تكثرن ... فكم مكثرٍ يا أخي انحرم",
+                english: "And befriend a noble (person) and do not take too many (companions) ... For how many how had too many, o my brother, have been deprived (of knowledge).",
+                sharh: "<strong>Sharh:</strong> His saying: '(And befriend a noble)' is a command that if a student must mix with others, they must choose a companion who is righteous, intelligent, and helps them look after their Deen; '(and do not take too many)' is a direct prohibition against multiplying your circle of friends, even if they are righteous; '(For how many who had too many, o my brother, have been deprived)' is a warning that having too many companions requires a person to waste their hours in constant socializing, visiting, and gathering, which ultimately deprives the student of the isolated time needed to memorize and review knowledge."
+            },
+            {
+                number: 7,
+                arabic: "وحقق إذا رمت شيئًا ولا ... تسمن بوهمك ذات الورم",
+                english: "And verify when you seek something and do not ... swell up your delusions with that swelling.",
+                sharh: "<strong>Sharh:</strong> His saying: '(And verify when you seek something)' is a strict command to perform deep research (Tahqeeq) and check the proofs whenever you evaluate a religious opinion or a fatwa; '(and do not ... swell up your delusions)' is a warning against allowing your own guesswork, ignorance, or blind following to blow up a weak, unscholarly position in your mind; '(with that swelling)' literally means to see something swelling and to view and treat it as if it were healthy and meant to swell, this means to treat a popular but completely wrong verdict (batil) as if it were a healthy, massive truth (Haqq), which ultimately corrupts your foundation in the Shari'ah."
+            },
+            {
+                number: 8,
+                arabic: "رأيت العلوم وأصحابها ... لدى كل ذي فطرةٍ تحترم",
+                english: "I have seen the sciences and its possessors ... With every possessor of (sound) natural disposition, are respected.",
+                sharh: "<strong>Sharh:</strong> His saying: '(I have seen the sciences and its possessors)' is a clear observation regarding the high status of Islamic knowledge and the scholars and students who carry it; '(With every possessor of natural disposition)' means that anyone whose innate human nature remains uncorrupted will automatically recognize the value of truth; '(are respected)' means they are highly honored and esteemed by default, showing that only those with ruined and hardened hearts will belittle Islamic knowledge or look down upon the scholars of Ahl As-Sunnah Wal-Jama'ah."
+            },
+            {
+                number: 9,
+                arabic: "فإن رمت يا صاحبي رفعةً ... بدنيا وأخرى فلذ بالقلم",
+                english: "For if you seek, o my companion, a high status ... In this world and the Next, so resort to the pen.",
+                sharh: "<strong>Sharh:</strong> His saying: '(For if you seek, o my companion, a high status)' is a statement showing that if a student desires true honor, they must follow the correct path; '(in this world and the Next)' means that true success is not just gaining wealth or fame today, but earning a high station with Allah in the Hereafter through sincere actions; '(so resort to the pen)' is a firm command to turn completely to writing, documenting, and studying Islamic knowledge, because the pen is the primary tool used to preserve the Shari'ah."
+            },
+            {
+                number: 10,
+                arabic: "وأخلص لربك واعمل بما ... علمت وإن تلق فيه الألم",
+                english: "And be sincere to your Lord and act upon what... You have learned, even if in it you face pain.",
+                sharh: "<strong>Sharh:</strong> His saying: '(And be sincere to your Lord)' is a strict command to purify your intention purely for Allah alone, because seeking knowledge without sincerity leads to the Fire; '(and act upon what... you have learned)' is an obligation to practice the knowledge you acquire, because knowledge without actions is a proof against the student on the Day of Judgment; '(even if in it you face pain)' is a realistic warning that practicing the truth and staying firm on the Sunnah will bring hardship, exhaustion, and trials, but the student must remain patient through the suffering to earn the reward."
+            },
+            {
+                number: 11,
+                arabic: "وصابر وثابر ولا تكسلن ... فإن الهموم بقدر الهمم",
+                english: "And be patient and persevere and do not be lazy... For indeed worries are in proportion to determinations.",
+                sharh: "<strong>Sharh:</strong> His saying: '(And be patient and persevere)' is a command to outlast the difficulties of seeking knowledge and to remain steadfast without quitting when the lessons become tiring; '(and do not be lazy)' is a strict prohibition against falling into laziness or procrastination, because laziness prevents the student from reaching any noble goal; '(for indeed, worries are in proportion to determinations)' is a realistic rule showing that the higher a student's ambition and drive to master the Shari'ah, the greater the weights, anxieties, and heavy burdens they will have to carry, meaning that great rewards only come through facing great struggles."
+            },
+            ];
+
+        // ==========================================
+        // FUNCTIONALITY SECTION
+        // ==========================================
+        
+        document.getElementById('pageCounter').innerText = poemData.length;
+        const container = document.getElementById('poemContainer');
+        
+        function displayVerses(data) {
+            container.innerHTML = "";
+            if(data.length === 0) {
+                container.innerHTML = `<p class="no-results">No verses match your search query.</p>`;
+                return;
+            }
+            
+            data.forEach(verse => {
+                const card = document.createElement('div');
+                card.className = 'verse-card';
+                card.innerHTML = `
+                    <div class="verse-num">Verse #${verse.number}</div>
+                    <div class="arabic-text">${verse.arabic}</div>
+                    <div class="english-text">${verse.english}</div>
+                    <button class="sharh-btn" onclick="toggleSharh(this)">Show Sharh</button>
+                    <div class="sharh-box">${verse.sharh}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Dropdown toggle mechanism
+        function toggleSharh(btn) {
+            const sharhBox = btn.nextElementSibling;
+            if (sharhBox.style.display === "block") {
+                sharhBox.style.display = "none";
+                btn.innerText = "Show Sharh";
+            } else {
+                sharhBox.style.display = "block";
+                btn.innerText = "Hide Sharh";
+            }
+        }
+
+        // Live filtering mechanism (now searches Arabic, English, and Sharh)
+        function filterVerses() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filteredData = poemData.filter(verse => {
+                return verse.arabic.toLowerCase().includes(query) || 
+                       verse.english.toLowerCase().includes(query) ||
+                       verse.sharh.toLowerCase().includes(query) ||
+                       verse.number.toString().includes(query);
+            });
+            displayVerses(filteredData);
+        }
+
+        // Initial setup
+        displayVerses(poemData);
+    </script>
+
+</body>
+</html>
